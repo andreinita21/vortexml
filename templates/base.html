@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Vortex ML{% endblock %}</title>
+    <meta name="description" content="Vortex ML — Build and train neural networks with an intuitive visual interface.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/style.css?v={{ cache_version }}">
+    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    {% block head %}{% endblock %}
+</head>
+
+<body>
+    <nav class="navbar">
+        <a href="/" class="nav-logo">
+            <span class="logo-icon">◎</span>
+            <span class="logo-text">Vortex<span class="logo-accent">ML</span></span>
+        </a>
+        <div class="nav-links">
+            <a href="/dataset" class="nav-link {% if active == 'dataset' %}active{% endif %}">
+                <span class="nav-icon">📊</span> Dataset
+            </a>
+            <a href="/architect" class="nav-link {% if active == 'architect' %}active{% endif %}">
+                <span class="nav-icon">🧠</span> Architect
+            </a>
+            <a href="/training" class="nav-link {% if active == 'training' %}active{% endif %}">
+                <span class="nav-icon">⚡</span> Training
+            </a>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        {% block content %}{% endblock %}
+    </main>
+
+    <script src="/static/js/app.js?v={{ cache_version }}"></script>
+    {% block scripts %}{% endblock %}
+</body>
+
+</html>

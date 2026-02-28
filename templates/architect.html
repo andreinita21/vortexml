@@ -1,0 +1,153 @@
+{% extends "base.html" %}
+{% set active = "architect" %}
+
+{% block title %}Architecture Builder — Vortex ML{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>🧠 Architecture Builder</h1>
+    <p>Choose a neural network type, configure layers, and set hyperparameters.</p>
+</div>
+
+<!-- Weight Upload Zone -->
+<div class="glass-panel">
+    <div class="panel-title"><span class="pt-icon">📦</span> Load Pretrained Weights</div>
+    <p class="text-muted mb-2">Upload a <code>.pt</code> weight file to auto-restore the architecture and
+        hyperparameters.</p>
+    <div class="weight-upload-zone" id="weight-upload-zone">
+        <div class="upload-zone-content">
+            <span class="upload-zone-icon">⬆️</span>
+            <span class="upload-zone-text">Drag & drop a <strong>.pt</strong> file here, or <span
+                    class="upload-zone-link">browse</span></span>
+        </div>
+        <input type="file" id="weight-file-input" accept=".pt" class="hidden-input">
+    </div>
+    <div class="weight-upload-status hidden" id="weight-upload-status">
+        <span class="upload-status-icon">✅</span>
+        <span class="upload-status-text" id="weight-status-text"></span>
+    </div>
+</div>
+
+<!-- Network Type Selector -->
+<div class="glass-panel">
+    <div class="panel-title"><span class="pt-icon">🔬</span> Select Architecture</div>
+    <div class="arch-grid" id="arch-grid">
+        <!-- Populated by JS -->
+        <div class="text-center text-muted" style="grid-column: 1/-1;">
+            <div class="spinner"></div>
+            <p class="mt-1">Loading architectures...</p>
+        </div>
+    </div>
+</div>
+
+<!-- Layer Configurator -->
+<div class="glass-panel hidden" id="layer-config-section">
+    <div class="panel-title"><span class="pt-icon">📐</span> Configure Layers</div>
+    <p class="text-muted mb-2">Add hidden layers and set the number of neurons in each.</p>
+
+    <div class="layer-list" id="layer-list">
+        <!-- Populated by JS -->
+    </div>
+
+    <div class="mt-2">
+        <button class="btn btn-secondary btn-sm" id="btn-add-layer">+ Add Layer</button>
+    </div>
+</div>
+
+<!-- Hyperparameters -->
+<div class="glass-panel hidden" id="hyper-section">
+    <div class="panel-title"><span class="pt-icon">⚙️</span> Hyperparameters</div>
+
+    <div class="form-row">
+        <div class="form-group">
+            <label class="form-label" for="inp-epochs">Epochs</label>
+            <input type="number" class="form-input" id="inp-epochs" value="50" min="1" max="5000">
+        </div>
+        <div class="form-group">
+            <label class="form-label" for="inp-lr">Learning Rate</label>
+            <input type="number" class="form-input" id="inp-lr" value="0.001" step="0.0001" min="0.00001" max="1">
+        </div>
+        <div class="form-group">
+            <label class="form-label" for="inp-batch">Batch Size</label>
+            <select class="form-select" id="inp-batch">
+                <option value="16">16</option>
+                <option value="32" selected>32</option>
+                <option value="64">64</option>
+                <option value="128">128</option>
+                <option value="256">256</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label class="form-label" for="inp-optimizer">Optimizer</label>
+            <select class="form-select" id="inp-optimizer">
+                <option value="adam">Adam</option>
+                <option value="adamw">AdamW</option>
+                <option value="sgd">SGD</option>
+                <option value="rmsprop">RMSprop</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label class="form-label" for="inp-activation">Activation</label>
+            <select class="form-select" id="inp-activation">
+                <option value="relu">ReLU</option>
+                <option value="leaky_relu">Leaky ReLU</option>
+                <option value="elu">ELU</option>
+                <option value="selu">SELU</option>
+                <option value="gelu">GELU</option>
+                <option value="tanh">Tanh</option>
+                <option value="sigmoid">Sigmoid</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Early Stopping -->
+    <div class="es-section">
+        <div class="es-header">
+            <label class="toggle-switch">
+                <input type="checkbox" id="inp-es-enabled">
+                <span class="toggle-slider"></span>
+            </label>
+            <span class="es-label">Early Stopping</span>
+        </div>
+        <div class="es-params hidden" id="es-params">
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label" for="inp-es-patience">Patience</label>
+                    <input type="number" class="form-input" id="inp-es-patience" value="10" min="1" max="500">
+                    <span class="form-hint">Epochs to wait for improvement</span>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="inp-es-delta">Min Delta</label>
+                    <input type="number" class="form-input" id="inp-es-delta" value="0.0001" step="0.0001" min="0"
+                        max="1">
+                    <span class="form-hint">Minimum change to qualify as improvement</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Project Name -->
+    <div class="form-row mt-2">
+        <div class="form-group" style="flex: 1;">
+            <label class="form-label" for="inp-project-name">Project Name</label>
+            <input type="text" class="form-input" id="inp-project-name" value="VortexProject" placeholder="MyProject">
+            <span class="form-hint">Used in the weight filename</span>
+        </div>
+    </div>
+</div>
+
+<!-- Architecture Preview -->
+<div class="glass-panel hidden" id="preview-arch-section">
+    <div class="panel-title"><span class="pt-icon">👁️</span> Architecture Preview</div>
+    <canvas id="arch-preview-canvas" class="network-viz"></canvas>
+</div>
+
+<div class="action-row hidden" id="action-row">
+    <a href="/dataset" class="btn btn-secondary">← Back to Dataset</a>
+    <button class="btn btn-primary" id="btn-start-training">Start Training ⚡</button>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/js/architect.js?v={{ cache_version }}"></script>
+{% endblock %}

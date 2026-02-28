@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% set active = "dataset" %}
+
+{% block title %}Dataset Designer — Vortex ML{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>📊 Dataset Designer</h1>
+    <p>Upload your data, preview it, and select the columns for training.</p>
+</div>
+
+<!-- Steps Indicator -->
+<div class="steps">
+    <div class="step active" id="step-1">
+        <div class="step-number">1</div>
+        <span class="step-text">Upload File</span>
+    </div>
+    <div class="step" id="step-2">
+        <div class="step-number">2</div>
+        <span class="step-text">Preview Data</span>
+    </div>
+    <div class="step" id="step-3">
+        <div class="step-number">3</div>
+        <span class="step-text">Select Columns</span>
+    </div>
+</div>
+
+<!-- Step 1: Upload -->
+<div class="glass-panel" id="upload-section">
+    <div class="panel-title"><span class="pt-icon">📁</span> Upload Dataset</div>
+    <div class="upload-zone" id="upload-zone">
+        <div class="upload-icon">⬆️</div>
+        <h3>Drag & drop your file here</h3>
+        <p>or click to browse — CSV, XLSX, XLS supported (max 100 MB)</p>
+        <input type="file" id="file-input" accept=".csv,.xlsx,.xls">
+    </div>
+    <div class="upload-progress" id="upload-progress">
+        <div class="progress-bar-container">
+            <div class="progress-bar" id="upload-bar" style="width: 0%"></div>
+        </div>
+        <p class="text-muted mt-1 text-center" id="upload-status">Uploading...</p>
+    </div>
+</div>
+
+<!-- Step 2: Preview -->
+<div class="glass-panel hidden" id="preview-section">
+    <div class="flex-between mb-2">
+        <div class="panel-title mb-0"><span class="pt-icon">👁️</span> Data Preview</div>
+        <div id="file-badge"></div>
+    </div>
+    <div class="summary-row" id="data-summary"></div>
+    <div class="data-table-wrapper">
+        <table class="data-table" id="preview-table">
+            <thead id="preview-thead"></thead>
+            <tbody id="preview-tbody"></tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Step 3: Column Picker -->
+<div class="glass-panel hidden" id="picker-section">
+    <div class="panel-title"><span class="pt-icon">🎯</span> Select Columns</div>
+    <p class="text-muted mb-2">
+        Click <strong>Feature</strong> to mark input variables, and <strong>Target</strong> to select what the model
+        should predict.
+    </p>
+    <div class="column-picker" id="column-picker"></div>
+
+    <div class="action-row">
+        <a href="/architect" class="btn btn-primary" id="btn-continue" disabled>
+            Continue to Architecture Builder →
+        </a>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/js/dataset.js?v={{ cache_version }}"></script>
+{% endblock %}
