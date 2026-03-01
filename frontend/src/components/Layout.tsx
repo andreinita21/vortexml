@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { NavLink, Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import Footer from './Footer';
@@ -7,7 +7,7 @@ const navLinks = [
     { to: '/dataset', label: 'Dataset' },
     { to: '/architect', label: 'Architect' },
     { to: '/training', label: 'Training' },
-    { to: '/courses', label: 'Learn' },
+    { to: '/learn', label: 'Learn' },
 ];
 
 const Layout: React.FC = () => {
@@ -16,6 +16,11 @@ const Layout: React.FC = () => {
     const location = useLocation();
 
     const isHome = location.pathname === '/';
+
+    // Scroll to top on route change
+    useEffect(() => {
+        window.scrollTo(0, 0);
+    }, [location.pathname]);
 
     const handleLogout = async () => {
         try {
