@@ -356,7 +356,7 @@ MOCK_COURSES = [
         "description": "Learn the mathematics, history, and intuition behind neural networks.",
         "duration": "25 min",
         "tags": ["Beginner", "Theory", "History"],
-        "content": """# Introduction to Neural Networks
+        "content": r"""# Introduction to Neural Networks
 
 Neural networks are computing systems inspired by the biological neural networks that constitute animal brains. They are the backbone of modern Deep Learning, powering everything from voice assistants to autonomous vehicles.
 
@@ -443,7 +443,7 @@ Proceed to our specialized courses for a deep dive into the architectures we sup
         "description": "Master classic feedforward networks: Multi-Layer Perceptrons and DNNs.",
         "duration": "15 min",
         "tags": ["Architecture", "Fundamentals"],
-        "content": """# Multi-Layer Perceptrons (MLP) and Deep Neural Networks (DNN)
+        "content": r"""# Multi-Layer Perceptrons (MLP) and Deep Neural Networks (DNN)
 
 ## The Multi-Layer Perceptron (MLP)
 An MLP is the quintessential deep learning architecture. It consists of multiple layers of nodes in a directed graph, with each layer fully connected to the next one. 
@@ -491,7 +491,7 @@ class DNNModel(nn.Module):
         "description": "Learn how convolutions apply to sequential and tabular feature data.",
         "duration": "20 min",
         "tags": ["Architecture", "Pattern Recognition"],
-        "content": """# 1D Convolutional Neural Networks (CNN-1D)
+        "content": r"""# 1D Convolutional Neural Networks (CNN-1D)
 
 While 2D CNNs are famous for image processing, **1D CNNs** are incredibly effective for sequential data, time series, and even tabular data where local feature interactions exist.
 
@@ -548,7 +548,7 @@ class CNN1DModel(nn.Module):
         "description": "Dive into Recurrent networks and memory mechanism architectures.",
         "duration": "25 min",
         "tags": ["Architecture", "Time-Series", "Memory"],
-        "content": """# Recurrent Architectures (RNN, LSTM, GRU)
+        "content": r"""# Recurrent Architectures (RNN, LSTM, GRU)
 
 Feedforward networks (like MLPs) have no memory. They process each input independently. Recurrent Neural Networks (RNNs) address this by maintaining a hidden state $h_t$ that carries information across time steps.
 
@@ -608,7 +608,7 @@ class LSTMModel(nn.Module):
         "description": "Learn representation learning through Encoders and Decoders.",
         "duration": "15 min",
         "tags": ["Architecture", "Unsupervised", "Anomaly Detection"],
-        "content": """# Autoencoders (AE)
+        "content": r"""# Autoencoders (AE)
 
 Autoencoders are an unsupervised learning technique where neural networks are trained to copy their input to their output. 
 
@@ -674,7 +674,7 @@ class AutoencoderModel(nn.Module):
         "description": "Master Skip Connections designed to train ultra-deep networks.",
         "duration": "18 min",
         "tags": ["Architecture", "Deep Learning"],
-        "content": """# Residual Networks (ResNet)
+        "content": r"""# Residual Networks (ResNet)
 
 As deep learning progressed, researchers realized that adding more layers didn't always improve performance. Often, **ultradeep networks performed worse** than shallow ones due to the vanishing gradient problem.
 
@@ -746,7 +746,7 @@ class ResNetModel(nn.Module):
         "description": "Understand Attention mechanisms, the foundation of modern LLMs.",
         "duration": "30 min",
         "tags": ["Architecture", "State of the Art"],
-        "content": """# Transformers and Attention Mechanisms
+        "content": r"""# Transformers and Attention Mechanisms
 
 Introduced in the seminal 2017 paper *"Attention Is All You Need"*, Transformers completely usurped RNNs and LSTMs, leading directly to the creation of GPT, BERT, and the modern generative AI era.
 
@@ -816,7 +816,7 @@ class TransformerModel(nn.Module):
         "description": "Combine memorization and generalization (invented by Google for Recommender systems).",
         "duration": "15 min",
         "tags": ["Architecture", "Production"],
-        "content": """# Wide & Deep Networks
+        "content": r"""# Wide & Deep Networks
 
 Originally developed by Google in 2016 for their Play Store Recommendation Engine, the Wide & Deep architecture elegantly solves a classic problem: how do we memorize specific sparse rules while still generalizing to unseen data?
 
