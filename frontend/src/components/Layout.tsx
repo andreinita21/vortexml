@@ -10,6 +10,9 @@ const Layout: React.FC = () => {
                     <span className="logo-text">Vortex<span className="logo-accent">ML</span></span>
                 </NavLink>
                 <div className="nav-links">
+                    <NavLink to="/courses" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
+                        <span className="nav-icon">🎓</span> Courses
+                    </NavLink>
                     <NavLink to="/dataset" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
                         <span className="nav-icon">📊</span> Dataset
                     </NavLink>

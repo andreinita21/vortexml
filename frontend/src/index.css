@@ -1444,3 +1444,252 @@ body::before {
     margin-top: 1rem;
 }
 
+/* ═══════════════════════════════════════════════════════
+   COURSES & BENTO GRID 
+   ═══════════════════════════════════════════════════════ */
+
+.courses-container {
+    animation: fadeInUp 0.5s var(--ease-out);
+}
+
+.bento-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 1.5rem;
+    padding-bottom: 3rem;
+}
+
+.bento-card {
+    position: relative;
+    padding: 1.5rem;
+    border-radius: var(--radius-xl);
+    background: var(--bg-card);
+    border: 1px solid var(--border-glass);
+    cursor: pointer;
+    overflow: hidden;
+    transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+    transform: translateZ(0); /* Hardware accel */
+}
+
+/* Liquid Glass Backdrop */
+.bento-card-bg {
+    position: absolute;
+    inset: 0;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    background: linear-gradient(135deg, rgba(255,255,255,0.02) 0%, rgba(255,255,255,0) 100%);
+    z-index: 0;
+}
+
+/* Hover glow effect tracing the cursor (pure CSS approximation) */
+.bento-hover-effect {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 150%;
+    height: 150%;
+    background: radial-gradient(circle at center, rgba(139, 92, 246, 0.15) 0%, transparent 50%);
+    transform: translate(-50%, -50%) scale(0.5);
+    opacity: 0;
+    transition: all 0.6s var(--ease-out);
+    pointer-events: none;
+    z-index: 1;
+}
+
+.bento-card:hover {
+    transform: translateY(-4px) scale(1.01);
+    border-color: rgba(139, 92, 246, 0.4);
+    box-shadow: 0 16px 40px -8px rgba(0,0,0,0.5), 0 0 30px rgba(139, 92, 246, 0.15);
+}
+
+.bento-card:hover .bento-hover-effect {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+}
+
+.bento-content {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.bento-header {
+    margin-bottom: 1.25rem;
+}
+
+.bento-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    font-size: 1.25rem;
+    border: 1px solid rgba(255,255,255,0.05);
+}
+
+.bento-duration {
+    font-size: 0.8rem;
+    font-weight: 600;
+    font-family: var(--font-mono);
+    color: var(--text-muted);
+}
+
+.bento-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    line-height: 1.3;
+}
+
+.bento-desc {
+    font-size: 0.9rem;
+    line-height: 1.5;
+    margin-bottom: 1.5rem;
+    flex-grow: 1;
+}
+
+.bento-tags {
+    margin-top: auto;
+}
+
+.bento-tag {
+    font-size: 0.75rem;
+    font-weight: 500;
+    padding: 0.2rem 0.6rem;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 6px;
+    color: var(--text-secondary);
+}
+
+.bento-tag-sm {
+    font-size: 0.7rem;
+    padding: 0.1rem 0.5rem;
+}
+
+/* COURSE DETAIL SUB-COMPONENTS */
+
+.course-detail-container {
+    animation: fadeInUp 0.5s var(--ease-out);
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.course-detail-icon {
+    font-size: 1.5rem;
+}
+
+/* Text Course (Markdown) */
+.course-text-container {
+    padding: 3rem;
+    background: var(--bg-card); /* Keep the panel look but reading-friendly */
+}
+
+/* Very simple and clean markdown styling mimicking Notion */
+.markdown-content {
+    font-family: 'Space Grotesk', system-ui, sans-serif;
+    line-height: 1.7;
+    font-size: 1.05rem;
+    color: #e0e0ea;
+}
+
+.markdown-content h1, .markdown-content h2, .markdown-content h3 {
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+    color: var(--text-primary);
+    font-weight: 700;
+}
+
+.markdown-content h1 { font-size: 2rem; border-bottom: 1px solid var(--border-glass); padding-bottom: 0.5rem; }
+.markdown-content h2 { font-size: 1.5rem; }
+.markdown-content h3 { font-size: 1.25rem; }
+
+.markdown-content p { margin-bottom: 1.25rem; }
+.markdown-content a { color: var(--accent-5); text-decoration: none; border-bottom: 1px solid transparent; transition: border-color 0.2s; }
+.markdown-content a:hover { border-color: var(--accent-5); }
+.markdown-content ul, .markdown-content ol { padding-left: 1.5rem; margin-bottom: 1.25rem; }
+.markdown-content li { margin-bottom: 0.5rem; }
+
+.markdown-content pre {
+    background: #090914;
+    padding: 1rem;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-glass);
+    overflow-x: auto;
+    margin-bottom: 1.25rem;
+    font-family: var(--font-mono);
+    font-size: 0.9rem;
+}
+.markdown-content code {
+    background: rgba(255,255,255,0.08);
+    padding: 0.1rem 0.3rem;
+    border-radius: 4px;
+    font-family: var(--font-mono);
+    font-size: 0.85em;
+    color: #e2e8f0;
+}
+
+.markdown-content pre code { background: transparent; padding: 0; }
+
+/* Video Course */
+.course-video-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.video-player-wrapper {
+    position: relative;
+    padding-bottom: 56.25%; /* 16:9 Aspect Ratio */
+    height: 0;
+    overflow: hidden;
+    border-radius: var(--radius-xl);
+}
+
+.video-iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: inherit;
+}
+
+.video-transcript {
+    line-height: 1.6;
+    font-size: 0.95rem;
+    padding: 0.5rem 0;
+}
+
+/* Lab Course */
+.course-lab-container {
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - 250px);
+    min-height: 600px;
+    overflow: hidden;
+}
+
+.lab-header {
+    background: rgba(6, 6, 15, 0.6);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--border-glass);
+    padding: 1rem 1.5rem;
+}
+
+.lab-iframe-wrapper {
+    flex-grow: 1;
+    position: relative;
+    background: #ffffff; /* For Jupyter */
+}
+
+.lab-iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
