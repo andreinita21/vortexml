@@ -7,6 +7,7 @@ import Architect from './pages/Architect';
 import Training from './pages/Training';
 import Courses from './pages/Courses';
 import CourseDetail from './pages/CourseDetail';
+import Learn from './pages/Learn';
 import Signin from './pages/Signin';
 import Signup from './pages/Signup';
 import Survey from './pages/Survey';
@@ -21,6 +22,7 @@ const App: React.FC = () => {
           <Route path="signin" element={<Signin />} />
           <Route path="signup" element={<Signup />} />
           <Route path="survey" element={<Survey />} />
+          <Route path="learn" element={<Learn />} />
           <Route path="courses" element={<Courses />} />
           <Route path="courses/:id" element={<CourseDetail />} />
           <Route path="dataset" element={<Dataset />} />
