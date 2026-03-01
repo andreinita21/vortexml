@@ -1,8 +1,4 @@
-/**
- * Vortex ML — Global App Utilities
- */
-
-function showToast(message, type = 'info') {
+export function showToast(message: string, type: 'info' | 'success' | 'error' | 'warning' = 'info') {
     const existing = document.querySelector('.toast');
     if (existing) existing.remove();
 
@@ -19,21 +15,23 @@ function showToast(message, type = 'info') {
     }, 3500);
 }
 
-async function apiGet(url) {
+export async function apiGet(url: string) {
     const res = await fetch(url);
+    if (!res.ok) throw new Error(await res.text());
     return res.json();
 }
 
-async function apiPost(url, body) {
+export async function apiPost(url: string, body: any) {
     const res = await fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),
     });
+    if (!res.ok && res.status >= 500) throw new Error(await res.text());
     return res.json();
 }
 
-function formatTime(seconds) {
+export function formatTime(seconds: number) {
     if (seconds < 0) return '--:--';
     const m = Math.floor(seconds / 60);
     const s = Math.floor(seconds % 60);
