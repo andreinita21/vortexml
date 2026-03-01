@@ -10,3 +10,5 @@ export default defineConfig({
     }
   }
 })
+
+// Added to trigger Vite restart
