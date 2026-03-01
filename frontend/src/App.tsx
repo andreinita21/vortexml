@@ -7,19 +7,28 @@ import Architect from './pages/Architect';
 import Training from './pages/Training';
 import Courses from './pages/Courses';
 import CourseDetail from './pages/CourseDetail';
+import Signin from './pages/Signin';
+import Signup from './pages/Signup';
+import Survey from './pages/Survey';
+import { AuthProvider } from './context/AuthContext';
 
 const App: React.FC = () => {
   return (
-    <Routes>
-      <Route path="/" element={<Layout />}>
-        <Route index element={<Home />} />
-        <Route path="courses" element={<Courses />} />
-        <Route path="courses/:id" element={<CourseDetail />} />
-        <Route path="dataset" element={<Dataset />} />
-        <Route path="architect" element={<Architect />} />
-        <Route path="training" element={<Training />} />
-      </Route>
-    </Routes>
+    <AuthProvider>
+      <Routes>
+        <Route path="/" element={<Layout />}>
+          <Route index element={<Home />} />
+          <Route path="signin" element={<Signin />} />
+          <Route path="signup" element={<Signup />} />
+          <Route path="survey" element={<Survey />} />
+          <Route path="courses" element={<Courses />} />
+          <Route path="courses/:id" element={<CourseDetail />} />
+          <Route path="dataset" element={<Dataset />} />
+          <Route path="architect" element={<Architect />} />
+          <Route path="training" element={<Training />} />
+        </Route>
+      </Routes>
+    </AuthProvider>
   );
 };
 

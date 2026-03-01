@@ -15,9 +15,23 @@ from training_engine import (
     create_model, train_model, stop_training, MODEL_REGISTRY,
     parse_weight_filename, WEIGHTS_DIR,
 )
+from models import db, User
 
 app = Flask(__name__)
-CORS(app)
+# Enable CORS with credentials support for session cookies pointing to the frontend
+CORS(app, supports_credentials=True, origins=["http://localhost:5173", "http://127.0.0.1:5173"])
+
+app.secret_key = "vortex-ml-secret-key-2026"
+app.config["MAX_CONTENT_LENGTH"] = 100 * 1024 * 1024  # 100 MB max upload
+
+# PostgreSQL configuration
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:postgres@localhost:5432/vortex_db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+db.init_app(app)
+
+with app.app_context():
+    db.create_all()
 app.secret_key = "vortex-ml-secret-key-2026"
 app.config["MAX_CONTENT_LENGTH"] = 100 * 1024 * 1024  # 100 MB max upload
 
@@ -55,6 +69,94 @@ _state = {
 def index():
     return jsonify({"status": "ok", "service": "Vortex ML API"})
 
+
+# ─────────────────────────────────────────────────────────
+# Authentication API
+# ─────────────────────────────────────────────────────────
+
+@app.route("/api/auth/signup", methods=["POST"])
+def signup():
+    data = request.get_json()
+    email = data.get("email")
+    username = data.get("username")
+    password = data.get("password")
+
+    if not email or not username or not password:
+        return jsonify({"error": "Missing required fields"}), 400
+
+    if User.query.filter_by(email=email).first():
+        return jsonify({"error": "Email already in use"}), 409
+        
+    if User.query.filter_by(username=username).first():
+        return jsonify({"error": "Username already taken"}), 409
+
+    new_user = User(email=email, username=username)
+    new_user.set_password(password)
+    
+    db.session.add(new_user)
+    db.session.commit()
+
+    # Log them in automatically
+    session["user_id"] = new_user.id
+    
+    return jsonify({"message": "User registered successfully", "user": new_user.to_dict()}), 201
+
+
+@app.route("/api/auth/signin", methods=["POST"])
+def signin():
+    data = request.get_json()
+    email = data.get("email")
+    password = data.get("password")
+
+    user = User.query.filter_by(email=email).first()
+    if user and user.check_password(password):
+        session["user_id"] = user.id
+        return jsonify({"message": "Signed in successfully", "user": user.to_dict()})
+        
+    return jsonify({"error": "Invalid email or password"}), 401
+
+
+@app.route("/api/auth/me", methods=["GET"])
+def get_me():
+    user_id = session.get("user_id")
+    if not user_id:
+        return jsonify({"error": "Not authenticated"}), 401
+        
+    user = User.query.get(user_id)
+    if not user:
+        # Invalid session, clear it
+        session.pop("user_id", None)
+        return jsonify({"error": "User not found"}), 404
+        
+    return jsonify({"user": user.to_dict()})
+
+
+@app.route("/api/auth/logout", methods=["POST"])
+def logout():
+    session.pop("user_id", None)
+    return jsonify({"message": "Logged out successfully"})
+
+
+@app.route("/api/auth/survey", methods=["POST"])
+def submit_survey():
+    user_id = session.get("user_id")
+    if not user_id:
+        return jsonify({"error": "Not authenticated"}), 401
+
+    data = request.get_json()
+    is_beginner = data.get("is_beginner")
+    
+    if is_beginner is None:
+        return jsonify({"error": "Missing survey result"}), 400
+
+    user = User.query.get(user_id)
+    if not user:
+        return jsonify({"error": "User not found"}), 404
+        
+    user.is_beginner = bool(is_beginner)
+    db.session.commit()
+    
+    return jsonify({"message": "Survey completed successfully", "user": user.to_dict()})
 
 # ─────────────────────────────────────────────────────────
 # Dataset API
