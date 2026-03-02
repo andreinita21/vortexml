@@ -54,10 +54,12 @@ const Training: React.FC = () => {
         setLogs(prev => [...prev, { id: logCounter.current++, html, type }]);
     };
 
-    // Auto-scroll logs
-    useEffect(() => {
-        if (logEndRef.current) logEndRef.current.scrollIntoView({ behavior: 'smooth' });
-    }, [logs]);
+    // Auto-scroll logs (disabled so user can scroll freely)
+    // useEffect(() => {
+    //     if (logEndRef.current) {
+    //         logEndRef.current.scrollIntoView();
+    //     }
+    // }, [logs]);
 
     // Init Socket & Chart
     useEffect(() => {
@@ -505,7 +507,7 @@ const Training: React.FC = () => {
                 </div>
                 <div className="glass-panel">
                     <div className="panel-title"><span className="pt-icon">🔮</span> Network Visualization</div>
-                    <canvas ref={networkCanvasRef} className="network-viz"></canvas>
+                    <canvas ref={networkCanvasRef} className="network-viz" style={{ display: 'block', width: '100%', height: '350px' }}></canvas>
                 </div>
             </div>
 
