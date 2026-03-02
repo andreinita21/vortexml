@@ -1,0 +1,184 @@
+# ==============================================================================
+# GLOBAL GLOBS (Applies to the entire repository)
+# ==============================================================================
+# Logs & Editor
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+*.local
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+.idea/
+
+# General Python / Build
+*.py[codz]
+*$py.class
+*.so
+*.egg-info/
+*.egg
+*.manifest
+*.spec
+*.cover
+*.py.cover
+*.mo
+*.pot
+*.sage.py
+*.pt
+__pycache__/
+.env
+.envrc
+
+# Dependencies
+node_modules/
+
+# ==============================================================================
+# FRONTEND
+# ==============================================================================
+frontend/logs
+frontend/dist
+frontend/dist-ssr
+
+# Editor directories and files
+frontend/.vscode/*
+!frontend/.vscode/extensions.json
+
+# ==============================================================================
+# BACKEND
+# ==============================================================================
+# Distribution / packaging
+backend/.Python
+backend/build/
+backend/develop-eggs/
+backend/dist/
+backend/downloads/
+backend/eggs/
+backend/.eggs/
+backend/lib/
+backend/lib64/
+backend/parts/
+backend/sdist/
+backend/var/
+backend/wheels/
+backend/share/python-wheels/
+backend/.installed.cfg
+backend/MANIFEST
+
+# Installer logs
+backend/pip-log.txt
+backend/pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+backend/htmlcov/
+backend/.tox/
+backend/.nox/
+backend/.coverage
+backend/.coverage.*
+backend/.cache
+backend/nosetests.xml
+backend/coverage.xml
+backend/.hypothesis/
+backend/.pytest_cache/
+backend/cover/
+
+# Django stuff:
+backend/local_settings.py
+backend/db.sqlite3
+backend/db.sqlite3-journal
+
+# Flask stuff:
+backend/instance/
+backend/.webassets-cache
+
+# Scrapy stuff:
+backend/.scrapy
+
+# Sphinx documentation
+backend/docs/_build/
+
+# PyBuilder
+backend/.pybuilder/
+backend/target/
+
+# Jupyter Notebook
+backend/.ipynb_checkpoints
+
+# IPython
+backend/profile_default/
+backend/ipython_config.py
+
+# pdm
+backend/.pdm-python
+backend/.pdm-build/
+
+# pixi
+backend/.pixi
+
+# PEP 582
+backend/__pypackages__/
+
+# Celery stuff
+backend/celerybeat-schedule
+backend/celerybeat.pid
+
+# Environments
+backend/.venv
+backend/env/
+backend/venv/
+backend/ENV/
+backend/env.bak/
+backend/venv.bak/
+
+# Spyder project settings
+backend/.spyderproject
+backend/.spyproject
+
+# Rope project settings
+backend/.ropeproject
+
+# mkdocs documentation
+backend/site/
+
+# mypy
+backend/.mypy_cache/
+backend/.dmypy.json
+backend/dmypy.json
+
+# Pyre type checker
+backend/.pyre/
+
+# pytype static type analyzer
+backend/.pytype/
+
+# Cython debug symbols
+backend/cython_debug/
+
+# Abstra
+backend/.abstra/
+
+# Ruff stuff:
+backend/.ruff_cache/
+
+# PyPI configuration file
+backend/.pypirc
+
+# Cursor
+backend/.cursorignore
+backend/.cursorindexingignore
+
+# Marimo
+backend/marimo/_static/
+backend/marimo/_lsp/
+backend/__marimo__/
+
+# Project-specific
+backend/DocumentareaProgresului/
+backend/uploads/
+backend/weights/
+backend/test_data.csv
