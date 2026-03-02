@@ -505,7 +505,7 @@ const Training: React.FC = () => {
                 </div>
                 <div className="glass-panel">
                     <div className="panel-title"><span className="pt-icon">🔮</span> Network Visualization</div>
-                    <canvas ref={networkCanvasRef} className="network-viz" style={{ width: '100%', height: '100%' }}></canvas>
+                    <canvas ref={networkCanvasRef} className="network-viz"></canvas>
                 </div>
             </div>
 
