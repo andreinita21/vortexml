@@ -24,16 +24,19 @@ CORS(app, supports_credentials=True, origins=["http://localhost:5173", "http://1
 app.secret_key = "vortex-ml-secret-key-2026"
 app.config["MAX_CONTENT_LENGTH"] = 100 * 1024 * 1024  # 100 MB max upload
 
-# PostgreSQL configuration
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:postgres@localhost:5432/vortex_db'
+# Database configuration — use SQLite fallback when PostgreSQL is unavailable
+if os.environ.get("VORTEX_USE_SQLITE") == "1" or os.environ.get("SQLALCHEMY_DATABASE_URI"):
+    _db_uri = os.environ.get("SQLALCHEMY_DATABASE_URI",
+        "sqlite:///" + os.path.join(os.path.dirname(__file__), "vortex.db"))
+    app.config['SQLALCHEMY_DATABASE_URI'] = _db_uri
+else:
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:postgres@localhost:5432/vortex_db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db.init_app(app)
 
 with app.app_context():
     db.create_all()
-app.secret_key = "vortex-ml-secret-key-2026"
-app.config["MAX_CONTENT_LENGTH"] = 100 * 1024 * 1024  # 100 MB max upload
 
 # Cache-busting: append version to static URLs so browser loads fresh JS/CSS
 app.config["SEND_FILE_MAX_AGE_DEFAULT"] = 0

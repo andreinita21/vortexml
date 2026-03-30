@@ -40,7 +40,7 @@ const Layout: React.FC = () => {
                     'fixed top-5 left-1/2 -translate-x-1/2 z-50',
                     'flex items-center justify-between',
                     'px-5 py-2.5 rounded-2xl',
-                    'w-[92%] max-w-4xl',
+                    'w-[92%] max-w-6xl',
                     // Liquid glass surface
                     'bg-white/[0.06]',
                     'backdrop-blur-2xl',

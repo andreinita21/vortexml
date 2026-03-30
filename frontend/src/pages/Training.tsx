@@ -54,9 +54,15 @@ const Training: React.FC = () => {
         setLogs(prev => [...prev, { id: logCounter.current++, html, type }]);
     };
 
-    // Auto-scroll logs
+    // Log container ref for scoped scrolling
+    const logContainerRef = useRef<HTMLDivElement>(null);
+
+    // Auto-scroll logs — scroll only within the log container, not the whole page
     useEffect(() => {
-        if (logEndRef.current) logEndRef.current.scrollIntoView({ behavior: 'smooth' });
+        const container = logContainerRef.current;
+        if (container) {
+            container.scrollTop = container.scrollHeight;
+        }
     }, [logs]);
 
     // Init Socket & Chart
@@ -248,15 +254,16 @@ const Training: React.FC = () => {
 
         const draw = () => {
             const dpr = window.devicePixelRatio || 1;
-            const rect = canvas.getBoundingClientRect();
-            if (rect.width === 0 || rect.height === 0) return;
+            // Use parent container dimensions to avoid canvas resize feedback loop
+            const parent = canvas.parentElement;
+            if (!parent) { frame = requestAnimationFrame(draw); return; }
+            const W = parent.clientWidth;
+            const H = 350; // Fixed height matching CSS .network-viz
+            if (W === 0) { frame = requestAnimationFrame(draw); return; }
 
-            canvas.width = rect.width * dpr;
-            canvas.height = rect.height * dpr;
+            canvas.width = W * dpr;
+            canvas.height = H * dpr;
             ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-
-            const W = rect.width;
-            const H = rect.height;
             const layerSizes = layerSizesRef.current;
             const isTr = isTrainingRef.current;
 
@@ -505,7 +512,7 @@ const Training: React.FC = () => {
                 </div>
                 <div className="glass-panel">
                     <div className="panel-title"><span className="pt-icon">🔮</span> Network Visualization</div>
-                    <canvas ref={networkCanvasRef} className="network-viz" style={{ width: '100%', height: '100%' }}></canvas>
+                    <canvas ref={networkCanvasRef} className="network-viz"></canvas>
                 </div>
             </div>
 
@@ -538,7 +545,7 @@ const Training: React.FC = () => {
                     </div>
                 </div>
 
-                <div className="training-log">
+                <div className="training-log" ref={logContainerRef}>
                     {logs.map(log => (
                         <div key={log.id} className={`log-entry ${log.type || ''}`} dangerouslySetInnerHTML={{ __html: log.html }} />
                     ))}

@@ -84,16 +84,17 @@ else
     ok "Virtual environment already exists."
 fi
 
-# Activate venv
+# Activate venv and use its Python explicitly
 source "$VENV_DIR/bin/activate"
+PYTHON="$VENV_DIR/bin/python"
 ok "Virtual environment activated."
 
 # Upgrade pip silently
-pip install --upgrade pip -q
+"$PYTHON" -m pip install --upgrade pip -q
 
 # Install requirements
 info "Installing Python dependencies (this may take a while on first run)…"
-pip install -r "$BACKEND_DIR/requirements.txt" -q
+"$PYTHON" -m pip install -r "$BACKEND_DIR/requirements.txt" -q
 ok "Python dependencies installed."
 
 # ── Check database connectivity ─────────────────────────
