@@ -79,7 +79,7 @@ def index():
 
 @app.route("/api/auth/signup", methods=["POST"])
 def signup():
-    data = request.get_json()
+    data = request.get_json(silent=True) or {}
     email = data.get("email")
     username = data.get("username")
     password = data.get("password")
@@ -107,7 +107,7 @@ def signup():
 
 @app.route("/api/auth/signin", methods=["POST"])
 def signin():
-    data = request.get_json()
+    data = request.get_json(silent=True) or {}
     email = data.get("email")
     password = data.get("password")
 
@@ -146,7 +146,7 @@ def submit_survey():
     if not user_id:
         return jsonify({"error": "Not authenticated"}), 401
 
-    data = request.get_json()
+    data = request.get_json(silent=True) or {}
     is_beginner = data.get("is_beginner")
     
     if is_beginner is None:
@@ -200,7 +200,7 @@ def get_dataset_info():
 
 @app.route("/api/dataset/configure", methods=["POST"])
 def configure_dataset():
-    data = request.get_json()
+    data = request.get_json(silent=True)
     if not data:
         return jsonify({"error": "No JSON body"}), 400
 
@@ -260,7 +260,7 @@ def list_architectures():
 
 @app.route("/api/model/configure", methods=["POST"])
 def configure_model():
-    data = request.get_json()
+    data = request.get_json(silent=True)
     if not data:
         return jsonify({"error": "No JSON body"}), 400
 

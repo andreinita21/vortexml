@@ -14,7 +14,7 @@ interface DatasetInfo {
     rows: number;
     cols: number;
     columns: ColumnInfo[];
-    preview: Record<string, any>[];
+    preview: Record<string, unknown>[];
 }
 
 const Dataset: React.FC = () => {
@@ -103,7 +103,7 @@ const Dataset: React.FC = () => {
 
         try {
             setUploadProgress(60);
-            const res = await fetch('/api/upload', { method: 'POST', body: formData });
+            const res = await fetch('/api/upload', { method: 'POST', credentials: 'include', body: formData });
             const data = await res.json();
 
             if (data.error) {
@@ -124,8 +124,9 @@ const Dataset: React.FC = () => {
                 setUploading(false);
             }, 400);
 
-        } catch (err: any) {
-            showToast('Upload failed: ' + err.message, 'error');
+        } catch (err) {
+            const msg = err instanceof Error ? err.message : String(err);
+            showToast('Upload failed: ' + msg, 'error');
             setUploading(false);
         }
     };
@@ -170,8 +171,9 @@ const Dataset: React.FC = () => {
 
             showToast('Dataset configured! Redirecting...', 'success');
             navigate('/architect');
-        } catch (err: any) {
-            showToast('Error: ' + err.message, 'error');
+        } catch (err) {
+            const msg = err instanceof Error ? err.message : String(err);
+            showToast('Error: ' + msg, 'error');
         }
     };
 
@@ -255,7 +257,7 @@ const Dataset: React.FC = () => {
                                 <tbody>
                                     {datasetInfo.preview.map((row, i) => (
                                         <tr key={i}>
-                                            {datasetInfo.columns.map(c => <td key={c.name}>{row[c.name] ?? ''}</td>)}
+                                            {datasetInfo.columns.map(c => <td key={c.name}>{String(row[c.name] ?? '')}</td>)}
                                         </tr>
                                     ))}
                                 </tbody>

@@ -26,7 +26,7 @@ const Layout: React.FC = () => {
 
     const handleLogout = async () => {
         try {
-            await fetch('/api/auth/logout', { method: 'POST' });
+            await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' });
             setUser(null);
             navigate('/');
         } catch (error) {
