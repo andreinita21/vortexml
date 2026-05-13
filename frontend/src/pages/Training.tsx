@@ -486,7 +486,24 @@ const Training: React.FC = () => {
             {/* Progress Bar */}
             <div className="glass-panel glass-panel-sm">
                 <div className="flex-between mb-1">
-                    <span className="text-muted" style={{ fontSize: '0.85rem', fontWeight: 600 }}>Training Progress</span>
+                    <span
+                        className="text-muted"
+                        style={{ fontSize: '0.85rem', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}
+                    >
+                        Training Progress
+                        {isTraining && (
+                            <span
+                                className="training-spinner"
+                                role="status"
+                                aria-label="Training in progress"
+                                title={
+                                    esInfo
+                                        ? `Training (early-stopping patience ${esInfo.counter}/${esInfo.patience})`
+                                        : 'Training in progress'
+                                }
+                            />
+                        )}
+                    </span>
                     <div className="flex gap-05">
                         {esInfo && (
                             <span

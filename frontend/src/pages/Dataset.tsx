@@ -334,8 +334,8 @@ const Dataset: React.FC = () => {
 
                                 return (
                                     <div key={col.name} className={`col-item ${isFeature ? 'selected-feature' : ''} ${isTarget ? 'selected-target' : ''}`}>
-                                        <div>
-                                            <div className="col-name">{col.name}</div>
+                                        <div className="col-info">
+                                            <div className="col-name" title={col.name}>{col.name}</div>
                                             <div className="col-dtype">{col.dtype} {col.is_numeric ? `· ${col.unique} unique` : `· ${col.unique} categories`}</div>
                                         </div>
                                         <div className="col-controls">

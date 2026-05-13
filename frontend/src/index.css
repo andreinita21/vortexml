@@ -601,18 +601,47 @@ body::before {
     background: rgba(249, 115, 22, 0.1);
 }
 
+/* When a row is selected the 1px border picks up a vivid colour. The
+   default .col-item padding (0.9rem 1rem) leaves the name text hugging
+   that bright border — visually cramped. Bump inner left/right padding
+   for selected rows only; box-sizing: border-box keeps the row's outer
+   dimensions and grid position untouched. */
+.col-item.selected-feature,
+.col-item.selected-target {
+    padding-left: 1.25rem;
+    padding-right: 1.25rem;
+}
+
+/* Two-pane layout: .col-info absorbs all remaining width (and truncates
+   long names with ellipsis), .col-controls holds a fixed intrinsic width
+   so the Feature/Target buttons sit at the same X-offset on every row. */
+.col-item .col-info {
+    flex: 1 1 0;
+    min-width: 0;          /* required so the flex child can shrink below
+                              its intrinsic content width (otherwise long
+                              column names push col-controls out of frame) */
+    overflow: hidden;
+}
+
 .col-item .col-name {
     font-weight: 600;
     font-size: 0.9rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .col-item .col-dtype {
     font-size: 0.75rem;
     color: var(--text-muted);
     font-family: var(--font-mono);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .col-item .col-controls {
+    flex: 0 0 auto;        /* never shrink, never grow — buttons stay put */
     margin-left: auto;
     display: flex;
     gap: 0.4rem;
@@ -896,22 +925,21 @@ body::before {
     position: relative;
 }
 
-.progress-bar::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-    animation: shimmer 2s infinite;
+/* Training-progress spinner — sits next to the "Training Progress" label
+   while a run is active (including the ES patience countdown). */
+.training-spinner {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    border: 2px solid rgba(139, 92, 246, 0.25);
+    border-top-color: var(--accent-1, #8b5cf6);
+    border-radius: 50%;
+    animation: training-spinner-spin 0.9s linear infinite;
+    vertical-align: -2px;
 }
 
-@keyframes shimmer {
-    0% {
-        transform: translateX(-100%);
-    }
-
-    100% {
-        transform: translateX(100%);
-    }
+@keyframes training-spinner-spin {
+    to { transform: rotate(360deg); }
 }
 
 /* ─── Training Dashboard ─── */
