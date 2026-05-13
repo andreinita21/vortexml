@@ -10,6 +10,18 @@ interface Architecture {
     icon: string;
 }
 
+interface ModelConfig {
+    arch_type: string;
+    layer_sizes?: number[];
+    epochs?: number;
+    lr?: number;
+    batch_size?: number;
+    optimizer?: string;
+    activation?: string;
+    project_name?: string;
+    early_stopping?: { enabled?: boolean; patience?: number; min_delta?: number };
+}
+
 const Architect: React.FC = () => {
     const navigate = useNavigate();
 
@@ -37,6 +49,7 @@ const Architect: React.FC = () => {
     const [weightsLoaded, setWeightsLoaded] = useState(false);
     const [weightStatus, setWeightStatus] = useState<string>('');
     const weightInputRef = useRef<HTMLInputElement>(null);
+    const startTrainingBtnRef = useRef<HTMLButtonElement>(null);
 
     const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -51,7 +64,7 @@ const Architect: React.FC = () => {
 
                 const state = await apiGet('/api/state');
                 if (mounted && state.has_model && state.model_config) {
-                    const cfg = state.model_config;
+                    const cfg = state.model_config as ModelConfig;
                     setSelectedArch(cfg.arch_type);
                     setLayers(cfg.layer_sizes || [128, 64]);
                     setEpochs(cfg.epochs || 50);
@@ -202,6 +215,7 @@ const Architect: React.FC = () => {
 
             const res = await fetch('/api/weights/upload', {
                 method: 'POST',
+                credentials: 'include',
                 body: formData,
             });
             const data = await res.json();
@@ -212,7 +226,7 @@ const Architect: React.FC = () => {
                 return;
             }
 
-            const cfg = data.config;
+            const cfg = data.config as ModelConfig;
             setWeightsLoaded(true);
             setSelectedArch(cfg.arch_type);
             setLayers(cfg.layer_sizes || [128, 64]);
@@ -225,8 +239,9 @@ const Architect: React.FC = () => {
 
             setWeightStatus(`Loaded: ${file.name} — ${cfg.arch_type.toUpperCase()}, ${(cfg.layer_sizes || []).join('→')} neurons`);
             showToast(`Weights loaded! Architecture auto-configured as ${cfg.arch_type.toUpperCase()}`, 'success');
-        } catch (e: any) {
-            showToast('Error uploading weights: ' + e.message, 'error');
+        } catch (e) {
+            const msg = e instanceof Error ? e.message : String(e);
+            showToast('Error uploading weights: ' + msg, 'error');
         }
         setIsUploading(false);
     };
@@ -269,8 +284,8 @@ const Architect: React.FC = () => {
             }
         };
 
+        const btn = startTrainingBtnRef.current;
         try {
-            const btn = document.getElementById('btn-start-training') as HTMLButtonElement;
             if (btn) btn.disabled = true;
 
             const res = await apiPost('/api/model/configure', config);
@@ -282,9 +297,9 @@ const Architect: React.FC = () => {
 
             showToast('Model configured! Redirecting to training...', 'success');
             setTimeout(() => navigate('/training'), 800);
-        } catch (e: any) {
-            showToast('Error: ' + e.message, 'error');
-            const btn = document.getElementById('btn-start-training') as HTMLButtonElement;
+        } catch (e) {
+            const msg = e instanceof Error ? e.message : String(e);
+            showToast('Error: ' + msg, 'error');
             if (btn) btn.disabled = false;
         }
     };
@@ -487,7 +502,7 @@ const Architect: React.FC = () => {
 
                     <div className="action-row">
                         <button className="btn btn-secondary" onClick={() => navigate('/dataset')}>← Back to Dataset</button>
-                        <button className="btn btn-primary" id="btn-start-training" onClick={handleStartTraining}>Start Training ⚡</button>
+                        <button className="btn btn-primary" ref={startTrainingBtnRef} onClick={handleStartTraining}>Start Training ⚡</button>
                     </div>
                 </>
             )}

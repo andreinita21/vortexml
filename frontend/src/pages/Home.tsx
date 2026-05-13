@@ -7,7 +7,6 @@ import { cn } from '../utils/cn';
 
 // Easing — one curve, used everywhere for a unified motion language
 const GLIDE = [0.22, 1, 0.36, 1] as const;
-const SMOOTH = [0.4, 0, 0.2, 1] as const;
 
 // --- Shared Reusable Animation Component ---
 const FadeIn = ({
