@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { apiGet, apiPost, showToast } from '../utils/helpers';
 import { useAuth } from '../context/AuthContext';
 import HelpButton from '../components/help/HelpButton';
+import AskButton from '../components/chatbot/AskButton';
 import { ARCH_HELP_TOPIC } from '../components/help/help-content';
 
 interface Architecture {
@@ -444,8 +445,9 @@ const Architect: React.FC = () => {
                                 onClick={() => setSelectedArch(a.key)}
                                 style={{ position: 'relative' }}
                             >
-                                <div style={{ position: 'absolute', top: 8, right: 8 }} onClick={(e) => e.stopPropagation()}>
+                                <div style={{ position: 'absolute', top: 8, right: 8, display: 'flex', gap: 4 }} onClick={(e) => e.stopPropagation()}>
                                     <HelpButton topic={ARCH_HELP_TOPIC[a.key] ?? 'arch_mlp'} />
+                                    <AskButton topic={ARCH_HELP_TOPIC[a.key] ?? 'arch_mlp'} />
                                 </div>
                                 <div className="arch-icon">{a.icon}</div>
                                 <div className="arch-name">{a.name}</div>
@@ -464,6 +466,7 @@ const Architect: React.FC = () => {
                         <div className="panel-title">
                             <span className="pt-icon">📐</span> Configure Layers
                             <HelpButton topic="layers" />
+                            <AskButton topic="layers" />
                         </div>
                         <p className="text-muted mb-2">Add hidden layers and set the number of neurons in each.</p>
 
@@ -498,15 +501,15 @@ const Architect: React.FC = () => {
                         <div className="panel-title"><span className="pt-icon">⚙️</span> Hyperparameters</div>
                         <div className="form-row">
                             <div className="form-group">
-                                <label className="form-label">Epochs <HelpButton topic="epochs" /></label>
+                                <label className="form-label">Epochs <HelpButton topic="epochs" /><AskButton topic="epochs" /></label>
                                 <input type="number" className="form-input" value={epochs} onChange={e => setEpochs(parseInt(e.target.value) || 50)} />
                             </div>
                             <div className="form-group">
-                                <label className="form-label">Learning Rate <HelpButton topic="learning_rate" /></label>
+                                <label className="form-label">Learning Rate <HelpButton topic="learning_rate" /><AskButton topic="learning_rate" /></label>
                                 <input type="number" className="form-input" step="0.0001" value={lr} onChange={e => setLr(parseFloat(e.target.value) || 0.001)} />
                             </div>
                             <div className="form-group">
-                                <label className="form-label">Batch Size <HelpButton topic="batch_size" /></label>
+                                <label className="form-label">Batch Size <HelpButton topic="batch_size" /><AskButton topic="batch_size" /></label>
                                 <select className="form-select" value={batchSize} onChange={e => setBatchSize(parseInt(e.target.value) || 32)}>
                                     <option value="16">16</option>
                                     <option value="32">32</option>
@@ -516,7 +519,7 @@ const Architect: React.FC = () => {
                                 </select>
                             </div>
                             <div className="form-group">
-                                <label className="form-label">Optimizer <HelpButton topic="optimizer" /></label>
+                                <label className="form-label">Optimizer <HelpButton topic="optimizer" /><AskButton topic="optimizer" /></label>
                                 <select className="form-select" value={optimizer} onChange={e => setOptimizer(e.target.value)}>
                                     <option value="adam">Adam</option>
                                     <option value="adamw">AdamW</option>
@@ -525,7 +528,7 @@ const Architect: React.FC = () => {
                                 </select>
                             </div>
                             <div className="form-group">
-                                <label className="form-label">Activation <HelpButton topic="activation" /></label>
+                                <label className="form-label">Activation <HelpButton topic="activation" /><AskButton topic="activation" /></label>
                                 <select className="form-select" value={activation} onChange={e => setActivation(e.target.value)}>
                                     <option value="relu">ReLU</option>
                                     <option value="leaky_relu">Leaky ReLU</option>
@@ -548,17 +551,18 @@ const Architect: React.FC = () => {
                                     </label>
                                     <span className="es-label">Early Stopping</span>
                                     <HelpButton topic="early_stopping" />
+                                    <AskButton topic="early_stopping" />
                                 </div>
                                 {esEnabled && (
                                     <div className="es-params">
                                         <div className="form-row">
                                             <div className="form-group">
-                                                <label className="form-label">Patience <HelpButton topic="patience" /></label>
+                                                <label className="form-label">Patience <HelpButton topic="patience" /><AskButton topic="patience" /></label>
                                                 <input type="number" className="form-input" value={esPatience} onChange={e => setEsPatience(parseInt(e.target.value) || 10)} />
                                                 <span className="form-hint">Epochs to wait for improvement</span>
                                             </div>
                                             <div className="form-group">
-                                                <label className="form-label">Min Delta <HelpButton topic="min_delta" /></label>
+                                                <label className="form-label">Min Delta <HelpButton topic="min_delta" /><AskButton topic="min_delta" /></label>
                                                 <input type="number" className="form-input" step="0.0001" value={esDelta} onChange={e => setEsDelta(parseFloat(e.target.value) || 0.0001)} />
                                                 <span className="form-hint">Minimum change to qualify as improvement</span>
                                             </div>
@@ -584,7 +588,7 @@ const Architect: React.FC = () => {
                         {/* Project Name */}
                         <div className="form-row mt-2">
                             <div className="form-group" style={{ flex: 1 }}>
-                                <label className="form-label">Project Name <HelpButton topic="project_name" /></label>
+                                <label className="form-label">Project Name <HelpButton topic="project_name" /><AskButton topic="project_name" /></label>
                                 <input type="text" className="form-input" value={projectName} onChange={e => setProjectName(e.target.value)} placeholder="MyProject" />
                                 <span className="form-hint">Used in the weight filename</span>
                             </div>

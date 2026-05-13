@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { apiGet, apiPost, showToast } from '../utils/helpers';
 import { useAuth } from '../context/AuthContext';
 import HelpButton from '../components/help/HelpButton';
+import AskButton from '../components/chatbot/AskButton';
 
 interface ColumnInfo {
     name: string;
@@ -303,6 +304,7 @@ const Dataset: React.FC = () => {
                         <div className="panel-title">
                             <span className="pt-icon">🎯</span> Select Columns
                             <HelpButton topic="features_target" />
+                            <AskButton topic="features_target" />
                         </div>
 
                         <div className="info-banner">

@@ -12,6 +12,8 @@ import threading
 
 import json as _json
 
+import anthropic
+
 from data_processor import save_uploaded_file, analyze_dataset, prepare_dataset
 from training_engine import (
     create_model, train_model, stop_training, MODEL_REGISTRY,
@@ -625,6 +627,144 @@ def load_project(project_id):
     _state["last_weights_file"] = proj.weight_filename
 
     return jsonify({"status": "ok", "config": cfg, "weight_filename": proj.weight_filename})
+
+
+# ─────────────────────────────────────────────────────────
+# Novice-mode Chatbot
+# ─────────────────────────────────────────────────────────
+_anthropic_client = None
+
+
+def _get_anthropic_client():
+    """Lazily build the Anthropic client. ANTHROPIC_API_KEY comes from env."""
+    global _anthropic_client
+    if _anthropic_client is None:
+        _anthropic_client = anthropic.Anthropic()
+    return _anthropic_client
+
+
+CHAT_SYSTEM_PROMPT = (
+    "You are a friendly machine-learning tutor embedded in VortexML, a web app "
+    "for training small neural networks on tabular data.\n\n"
+    "Your audience is a beginner who has explicitly opted in to Novice mode. "
+    "Help them understand:\n"
+    "- Core ML concepts (epochs, loss, overfitting, learning rate, optimisers, "
+    "  activation functions, train/val/test split, classification vs regression, etc.).\n"
+    "- The VortexML app's tabs and features:\n"
+    "  * Dataset tab — upload CSV / Excel, preview rows, pick which columns are\n"
+    "    features (inputs) and which column is the target (what the model predicts).\n"
+    "  * Architect tab — pick one of the 10 architectures (MLP, DNN, CNN-1D, RNN,\n"
+    "    LSTM, GRU, Autoencoder, ResNet, Transformer, Wide & Deep), configure hidden\n"
+    "    layer sizes and hyperparameters (epochs, learning rate, batch size, optimiser,\n"
+    "    activation), and optionally enable Early Stopping.\n"
+    "  * Training tab — live loss / accuracy chart and a network visualisation while\n"
+    "    the model trains; saves a .pt weights file when finished.\n"
+    "  * Profile tab — saved projects, each with its config + weights, downloadable\n"
+    "    or reloadable into the Architect.\n"
+    "- Picking reasonable defaults for a first run (e.g. MLP, layers [32,16], 20 epochs,\n"
+    "  Adam, lr 0.001, batch size 32, ReLU activation).\n\n"
+    "Guidelines:\n"
+    "- Keep answers short: 2-4 short paragraphs, plain prose, minimal code unless asked.\n"
+    "- Use simple language. Define jargon when you introduce it.\n"
+    "- Be encouraging and make concrete recommendations rather than hedging.\n"
+    "- If a question is unrelated to ML or VortexML, politely steer back.\n"
+    "- Never invent VortexML features that aren't in the list above."
+)
+
+# Limits to keep cost + latency predictable
+_CHAT_MAX_HISTORY = 20         # last N turns we'll forward to Claude
+_CHAT_MAX_MESSAGE_CHARS = 4000  # per-message cap (silently truncated)
+_CHAT_MAX_TOKENS = 1024         # cap on the assistant's reply
+
+
+def _chatbot_available_reason(user):
+    """Return None if the chatbot is available for this user, else a 'why not' string."""
+    if not user.is_beginner:
+        return "Chatbot is only available in Novice mode."
+    if not os.environ.get("ANTHROPIC_API_KEY"):
+        return "Chatbot is not configured. The admin must set ANTHROPIC_API_KEY."
+    return None
+
+
+@app.route("/api/chat/status", methods=["GET"])
+def chat_status():
+    user, err = _require_user()
+    if err:
+        return err
+    reason = _chatbot_available_reason(user)
+    if reason:
+        return jsonify({"available": False, "reason": reason})
+    return jsonify({"available": True})
+
+
+@app.route("/api/chat", methods=["POST"])
+def chat():
+    user, err = _require_user()
+    if err:
+        return err
+
+    reason = _chatbot_available_reason(user)
+    if reason:
+        # 503 when misconfigured server-side; 403 when the user isn't novice
+        status_code = 403 if user.is_beginner is False else 503
+        return jsonify({"error": reason}), status_code
+
+    data = request.get_json(silent=True) or {}
+    raw_messages = data.get("messages")
+    if not isinstance(raw_messages, list) or not raw_messages:
+        return jsonify({"error": "messages array required"}), 400
+
+    # Sanitise + cap incoming messages.
+    cleaned = []
+    for m in raw_messages[-_CHAT_MAX_HISTORY:]:
+        if not isinstance(m, dict):
+            continue
+        role = m.get("role")
+        content = m.get("content")
+        if role not in ("user", "assistant"):
+            continue
+        if not isinstance(content, str):
+            continue
+        content = content.strip()
+        if not content:
+            continue
+        if len(content) > _CHAT_MAX_MESSAGE_CHARS:
+            content = content[:_CHAT_MAX_MESSAGE_CHARS]
+        cleaned.append({"role": role, "content": content})
+
+    if not cleaned or cleaned[0]["role"] != "user":
+        return jsonify({"error": "First message must be from the user."}), 400
+
+    try:
+        client = _get_anthropic_client()
+        resp = client.messages.create(
+            model="claude-opus-4-7",
+            max_tokens=_CHAT_MAX_TOKENS,
+            system=[
+                {
+                    "type": "text",
+                    "text": CHAT_SYSTEM_PROMPT,
+                    "cache_control": {"type": "ephemeral"},
+                }
+            ],
+            messages=cleaned,
+        )
+    except anthropic.AuthenticationError:
+        return jsonify({"error": "Chatbot misconfigured (invalid API key)."}), 503
+    except anthropic.RateLimitError:
+        return jsonify({"error": "Chatbot is busy — please try again in a moment."}), 429
+    except anthropic.APIError as e:
+        return jsonify({"error": f"Chatbot error: {e}"}), 502
+    except Exception as e:
+        return jsonify({"error": f"Chatbot error: {e}"}), 500
+
+    text = ""
+    for block in resp.content:
+        if getattr(block, "type", None) == "text":
+            text = block.text
+            break
+
+    return jsonify({"role": "assistant", "content": text})
 
 
 # ─────────────────────────────────────────────────────────
