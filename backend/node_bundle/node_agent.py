@@ -29,6 +29,7 @@ except ImportError:
 from device_specs import detect_specs
 from data_processor import prepare_dataset
 from training_engine import create_model, train_model, get_torch_device, _stop_training
+from system_stats import SystemMonitor
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 CONFIG_PATH = os.path.join(HERE, "node_config.json")
@@ -97,6 +98,12 @@ def _run_job(payload):
     job_id = payload["job_id"]
     csv_path = None
     relay = CentralRelay(sio, job_id)
+    # Stream this machine's CPU/GPU/RAM + temps back while it trains.
+    monitor = SystemMonitor(
+        emit_fn=lambda s: _relay(job_id, "system_stats", s),
+        sleep_fn=time.sleep,
+    )
+    threading.Thread(target=monitor.loop, daemon=True).start()
     try:
         config = payload["config"]
         ds_name = payload.get("dataset_name") or "dataset.csv"
@@ -150,6 +157,7 @@ def _run_job(payload):
         except Exception:
             pass
     finally:
+        monitor.stop()
         # Never keep someone's dataset on disk after the run.
         if csv_path and os.path.exists(csv_path):
             try:
@@ -210,11 +218,58 @@ def on_stop(data):
     _stop_training.set()
 
 
+# ── Startup banners ──────────────────────────────────────
+_VORTEX_ART = r"""
+$$\    $$\                      $$\                               $$\      $$\ $$\
+$$ |   $$ |                     $$ |                              $$$\    $$$ |$$ |
+$$ |   $$ | $$$$$$\   $$$$$$\ $$$$$$\    $$$$$$\  $$\   $$\       $$$$\  $$$$ |$$ |
+\$$\  $$  |$$  __$$\ $$  __$$\\_$$  _|  $$  __$$\ \$$\ $$  |      $$\$$\$$ $$ |$$ |
+ \$$\$$  / $$ /  $$ |$$ |  \__| $$ |    $$$$$$$$ | \$$$$  /       $$ \$$$  $$ |$$ |
+  \$$$  /  $$ |  $$ |$$ |       $$ |$$\ $$   ____| $$  $$<        $$ |\$  /$$ |$$ |
+   \$  /   \$$$$$$  |$$ |       \$$$$  |\$$$$$$$\ $$  /\$$\       $$ | \_/ $$ |$$$$$$$$\
+    \_/     \______/ \__|        \____/  \_______|\__/  \__|      \__|     \__|\________|
+"""
+
+_STOP_ART = r"""
+         _            _
+        | |          | |    _
+   ___  | |_   _ __  | |  _| |_    ___
+  / __| | __| | '__| | | |_   _|  / __|
+ | (__  | |_  | |    | |   |_|   | (__
+  \___|  \__| |_| _  |_|          \___|
+  | |            | |
+  | |_ ___    ___| |_ ___  _ __
+  | __/ _ \  / __| __/ _ \| '_ \
+ | || (_) | \__ \ || (_) | |_) |
+  \__\___/  |___/\__\___/| .__/
+                          | |
+                          |_|
+"""
+
+_RESET = "\033[0m"
+
+
+def _ansi(rgb):
+    return f"\033[38;2;{rgb[0]};{rgb[1]};{rgb[2]}m"
+
+
+def _solid_banner(art, rgb):
+    """Paint every line of the art in one colour."""
+    a = _ansi(rgb)
+    return "\n".join(a + line + _RESET for line in art.strip("\n").splitlines())
+
+
 def main():
-    print("=" * 56)
-    print(f"  VortexML Node Agent — '{NICKNAME}'")
-    print(f"  Central server : {CENTRAL_URL}")
-    print("=" * 56)
+    # VortexML wordmark — lilly purple.
+    print()
+    print(_solid_banner(_VORTEX_ART, (190, 150, 255)))
+    print()
+    print(f"   node agent  ·  '{NICKNAME}'")
+    print(f"   central     ·  {CENTRAL_URL}")
+    print()
+    # "ctrl + c to stop" — red.
+    print(_solid_banner(_STOP_ART, (239, 68, 68)))
+    print()
     while True:
         try:
             sio.connect(CENTRAL_URL, transports=["websocket", "polling"])

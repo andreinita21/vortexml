@@ -88,6 +88,18 @@ Training auto-selects the best torch device: **Metal (MPS)** on Apple Silicon,
 CUDA on NVIDIA, otherwise CPU. The node agent does the same on the user's
 machine. Weights are always saved as a CPU-mapped `.pt` so they stay portable.
 
+### Live system metrics
+
+While a run trains, the machine doing the work streams CPU / GPU / RAM
+utilisation and CPU / GPU temperature to the Training page — the top strip
+plus the two **System Monitor** charts (temperature and utilisation).
+
+Everything works with **no setup and no privileges** — no `sudo`, no
+`powermetrics`. Temperature is read from the IOKit HID sensors on Apple
+Silicon (`/sys/class/thermal` on Linux); GPU utilisation from IOAccelerator;
+CPU/RAM from psutil. On a unified Apple Silicon SoC the CPU/GPU temperature
+split is approximate — both come from on-die sensors.
+
 ## Local testing of the node feature
 
 You can exercise the whole remote path on one machine — no tunnel needed:

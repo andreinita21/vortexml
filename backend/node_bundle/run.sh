@@ -29,17 +29,18 @@ if [ ! -d venv ]; then
 fi
 # shellcheck disable=SC1091
 source venv/bin/activate
-python -m pip install --upgrade pip -q
+# --no-cache-dir avoids the "Cache entry deserialization failed" warnings
+# that a stale/corrupt pip wheel cache produces.
+python -m pip install --upgrade pip -q --no-cache-dir
 echo "Installing dependencies — first run can take a few minutes…"
-python -m pip install -r requirements.txt -q
+python -m pip install -r requirements.txt -q --no-cache-dir
 
 # 3. Folder layout VortexML's training engine expects.
 mkdir -p uploads/weights
 
-# 4. Launch. Metal fallback lets MPS defer unsupported ops to the CPU.
+# 4. Launch. Metal fallback lets MPS defer unsupported ops to the CPU;
+#    unbuffered output so the banner + logs show immediately.
 export PYTORCH_ENABLE_MPS_FALLBACK=1
-echo "──────────────────────────────────────────────"
-echo "  Starting node agent — leave this window open."
-echo "  Press Ctrl+C to stop the node."
-echo "──────────────────────────────────────────────"
+export PYTHONUNBUFFERED=1
+echo "Launching node agent…"
 exec python node_agent.py

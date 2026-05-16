@@ -31,6 +31,7 @@ from training_engine import (
     MODEL_REGISTRY, parse_weight_filename, WEIGHTS_DIR,
 )
 from device_specs import detect_specs
+from system_stats import SystemMonitor
 from models import db, User, Project, Device
 
 app = Flask(__name__)
@@ -446,6 +447,12 @@ def start_training():
         _device_busy[device.id] = job_id
 
         def run():
+            # Stream CPU/GPU/RAM + temps for this machine while it trains.
+            monitor = SystemMonitor(
+                emit_fn=lambda s: socketio.emit("system_stats", s, room=room),
+                sleep_fn=socketio.sleep,
+            )
+            socketio.start_background_task(monitor.loop)
             try:
                 result = train_model(
                     model, data["train_loader"], data["val_loader"],
@@ -456,6 +463,8 @@ def start_training():
             except Exception as e:
                 socketio.emit("training_error", {"message": str(e)}, room=room)
                 result = None
+            finally:
+                monitor.stop()
             if result:
                 _state["last_weights_file"] = result["weight_filename"]
                 _persist_project(owner_user_id, config, result)
@@ -914,7 +923,8 @@ def download_agent(device_id):
             if os.path.exists(p):
                 z.write(p, arcname=fn)
         # Backend modules the agent reuses verbatim.
-        for fn in ("training_engine.py", "data_processor.py", "device_specs.py"):
+        for fn in ("training_engine.py", "data_processor.py", "device_specs.py",
+                   "system_stats.py"):
             z.write(os.path.join(backend_dir, fn), arcname=fn)
         # Per-device config — the API key that pairs this machine to the account.
         z.writestr("node_config.json", _json.dumps(node_config, indent=2))

@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
-import { X, Download, Laptop, Terminal, CircleCheck } from 'lucide-react';
+import { X, Download, Laptop, Terminal, CircleCheck, Copy, Check } from 'lucide-react';
 import { apiPost, showToast } from '../../utils/helpers';
 import type { Device } from './types';
+
+const RUN_COMMAND = 'chmod +x run.sh && ./run.sh';
 
 interface AddDeviceModalProps {
     onClose: () => void;
@@ -13,9 +15,20 @@ const AddDeviceModal: React.FC<AddDeviceModalProps> = ({ onClose, onCreated }) =
     const [nickname, setNickname] = useState('');
     const [creating, setCreating] = useState(false);
     const [created, setCreated] = useState<Device | null>(null);
+    const [copied, setCopied] = useState(false);
 
     const triggerDownload = (id: number) => {
         window.location.href = `/api/devices/${id}/agent.zip`;
+    };
+
+    const copyCommand = async () => {
+        try {
+            await navigator.clipboard.writeText(RUN_COMMAND);
+            setCopied(true);
+            setTimeout(() => setCopied(false), 1800);
+        } catch {
+            showToast('Copy failed — select the command and copy it manually.', 'warning');
+        }
     };
 
     const handleCreate = async () => {
@@ -120,11 +133,24 @@ const AddDeviceModal: React.FC<AddDeviceModalProps> = ({ onClose, onCreated }) =
                                 <div style={{
                                     fontFamily: 'var(--font-mono)', fontSize: '0.8rem',
                                     background: 'rgba(0,0,0,0.4)', borderRadius: 8,
-                                    padding: '0.55rem 0.7rem', margin: '0.4rem 0',
+                                    padding: '0.4rem 0.4rem 0.4rem 0.7rem', margin: '0.4rem 0',
                                     display: 'flex', alignItems: 'center', gap: '0.45rem',
                                 }}>
                                     <Terminal size={13} style={{ color: '#8b5cf6', flexShrink: 0 }} />
-                                    <span>chmod +x run.sh &amp;&amp; ./run.sh</span>
+                                    <span style={{ flex: 1, overflowX: 'auto', whiteSpace: 'nowrap' }}>{RUN_COMMAND}</span>
+                                    <button
+                                        type="button"
+                                        onClick={copyCommand}
+                                        title="Copy command to clipboard"
+                                        className="btn btn-secondary btn-sm"
+                                        style={{
+                                            padding: '0.3rem 0.55rem', flexShrink: 0,
+                                            display: 'inline-flex', alignItems: 'center', gap: '0.3rem',
+                                        }}
+                                    >
+                                        {copied ? <Check size={13} /> : <Copy size={13} />}
+                                        {copied ? 'Copied' : 'Copy'}
+                                    </button>
                                 </div>
                             </li>
                             <li>Leave that window open. When it prints
